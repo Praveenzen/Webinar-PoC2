@@ -79,16 +79,6 @@ export function ExplorePage() {
   }
 
   const shouldShowAsUpcoming = (webinar: Webinar) => {
-    // For contributors, show actual status
-    if (profile?.role === 'contributor') {
-      return isFuture(new Date(webinar.scheduled_date))
-    }
-    
-    // For users, show past webinars as "upcoming" to hide content
-    if (profile?.role === 'user' && isPast(new Date(webinar.scheduled_date))) {
-      return true // Show as upcoming even if it's past
-    }
-    
     return isFuture(new Date(webinar.scheduled_date))
   }
 

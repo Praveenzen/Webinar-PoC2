@@ -63,9 +63,9 @@ export function WebinarDetailPage() {
       return true
     }
     
-    // Users can only play video for future webinars or current live webinars
-    // Past webinars are hidden from users
-    return !isPast(new Date(webinar.scheduled_date))
+    // Users can only play video for past webinars (recorded content)
+    // Future webinars should show as "upcoming" with disabled video
+    return isPast(new Date(webinar.scheduled_date))
   }
 
   const getEmbedUrl = (url: string) => {
@@ -210,9 +210,9 @@ export function WebinarDetailPage() {
                   <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
                     <div className="text-center text-gray-500">
                       <Calendar className="h-16 w-16 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Webinar Coming Soon</h3>
-                      <p className="text-lg mb-2">This webinar is scheduled for the future</p>
-                      <p className="text-sm">Video content will be available when the webinar goes live</p>
+                      <h3 className="text-xl font-semibold mb-2">Upcoming Webinar</h3>
+                      <p className="text-lg mb-2">This webinar is scheduled for {format(new Date(webinar.scheduled_date), 'MMMM d, yyyy')}</p>
+                      <p className="text-sm">Video content will be available after the webinar has concluded</p>
                     </div>
                   </div>
                 )}

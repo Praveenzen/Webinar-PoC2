@@ -83,6 +83,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
 
       if (profileError) throw profileError
+
+      // Sign out the user immediately after signup to prevent auto-login
+      await supabase.auth.signOut()
     }
   }
 
