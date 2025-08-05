@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, User, UserCheck, Crown, Users, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, User, UserCheck, Crown, Users, CheckCircle, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export function SignUpPage() {
@@ -15,7 +15,7 @@ export function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [showSuccess, setShowSuccess] = useState(false)
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
   
   const { signUp } = useAuth()
   const navigate = useNavigate()
@@ -27,7 +27,20 @@ export function SignUpPage() {
 
     try {
       await signUp(formData.email, formData.password, formData.firstName, formData.lastName, formData.role, formData.userType)
-      setShowSuccess(true)
+      setShowSuccessToast(true)
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        role: 'user',
+        userType: 'public'
+      })
+      // Auto-hide toast after 5 seconds
+      setTimeout(() => {
+        setShowSuccessToast(false)
+      }, 5000)
     } catch (error: any) {
       setError(error.message || 'Failed to create account')
     } finally {
@@ -35,45 +48,22 @@ export function SignUpPage() {
     }
   }
 
-  const handleGoToLogin = () => {
-    navigate('/login', { 
-      state: { message: 'Account created successfully! Please log in.' }
-    })
-  }
-
-  if (showSuccess) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <div className="text-center">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Account Created Successfully!
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Your account has been created. Please log in to continue and start using the platform.
-              </p>
-              <button
-                onClick={handleGoToLogin}
-                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                Go to Login
-              </button>
-              <p className="mt-4 text-sm text-gray-500">
-                Already have the login page open?{' '}
-                <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-                  Click here
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 animate-slide-in">
+          <CheckCircle className="h-6 w-6" />
+          <span className="font-medium">Account created successfully! Please log in to continue.</span>
+          <button
+            onClick={() => setShowSuccessToast(false)}
+            className="ml-4 text-green-200 hover:text-white transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      )}
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
           Create your account
@@ -244,6 +234,22 @@ export function SignUpPage() {
           </form>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slide-in {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   )
 }
